@@ -65,19 +65,17 @@ const NavSideBar = () => {
             <p className="text-sm text-white font-bold truncate">{user.name}</p>
           </div>
           <Link
-            href="/profile"
-            className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 rounded-xl text-slate-300 text-[10px] font-black uppercase"
-          >
-            <FiUser /> My Profile
-          </Link>
-          <Link
             href="/dashboard"
+            onClick={() => setShowUserMenu(false)}
             className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 rounded-xl text-slate-300 text-[10px] font-black uppercase"
           >
             <FiLayout /> Dashboard
           </Link>
           <button
-            onClick={() => authClient.signOut()}
+            onClick={() => {
+              authClient.signOut();
+              setShowUserMenu(false);
+            }}
             className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-500/10 rounded-xl text-red-400 text-[10px] font-black uppercase w-full text-left"
           >
             <FiLogOut /> Logout
@@ -86,6 +84,7 @@ const NavSideBar = () => {
       ) : (
         <Link
           href="/login"
+          onClick={() => setShowUserMenu(false)}
           className="flex items-center gap-3 px-4 py-3 bg-cyan-500/10 rounded-xl text-cyan-400 text-[10px] font-black uppercase justify-center transition-all"
         >
           <FiLogIn /> Sign In / Join
@@ -94,15 +93,36 @@ const NavSideBar = () => {
     </motion.div>
   );
 
+  // ইউজার ইমেজ বা লোগো দেখানোর কমন কম্পোনেন্ট
+  const UserAvatar = ({ sizeClass }) => (
+    <div
+      className={`${sizeClass} rounded-full border-2 border-cyan-500/30 flex items-center justify-center overflow-hidden bg-black/20`}
+    >
+      {user?.image ? (
+        <img
+          src={user.image}
+          alt={user.name}
+          className="w-full h-full object-cover"
+          referrerPolicy="no-referrer"
+        />
+      ) : (
+        <span className="text-cyan-400 font-black italic">
+          {user ? getInitials(user.name) : 'RH'}
+        </span>
+      )}
+    </div>
+  );
+
   return (
     <>
+      {/* মোবাইল টপ বার */}
       <header className="md:hidden fixed top-0 left-0 w-full h-16 bg-[#010714]/90 backdrop-blur-md border-b border-white/5 z-[100] flex items-center px-6 justify-between">
         <div className="relative" ref={userMenuRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="w-10 h-10 rounded-full border-2 border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black italic text-sm"
+            className="focus:outline-none"
           >
-            {user ? getInitials(user.name) : 'RH'}
+            <UserAvatar sizeClass="w-10 h-10 text-xs" />
           </button>
           <AnimatePresence>{showUserMenu && <DropdownMenu />}</AnimatePresence>
         </div>
@@ -119,16 +139,18 @@ const NavSideBar = () => {
         </nav>
       </header>
 
+      {/* ট্যাবলেট ও ডেক্সটপ সাইডবার */}
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-20 lg:w-28 bg-[#010714] border-r border-white/5 z-[100] flex-col items-center py-10">
         <div className="mb-14 relative" ref={userMenuRef}>
           <button
             onClick={() => setShowUserMenu(!showUserMenu)}
-            className="w-12 lg:w-14 h-12 lg:h-14 rounded-full border-2 border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black italic text-lg shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+            className="focus:outline-none shadow-[0_0_15px_rgba(34,211,238,0.2)] rounded-full"
           >
-            {user ? getInitials(user.name) : 'RH'}
+            <UserAvatar sizeClass="w-12 lg:w-14 h-12 lg:h-14 text-lg" />
           </button>
           <AnimatePresence>{showUserMenu && <DropdownMenu />}</AnimatePresence>
         </div>
+
         <nav className="flex flex-col gap-8 w-full">
           {navItems.map(item => {
             const isActive = pathname === item.href;
@@ -160,6 +182,7 @@ const NavSideBar = () => {
             );
           })}
         </nav>
+
         <div className="mt-auto rotate-180 text-[10px] text-slate-700 font-bold tracking-[0.3em] [writing-mode:vertical-lr] opacity-30">
           V 3.0.2
         </div>

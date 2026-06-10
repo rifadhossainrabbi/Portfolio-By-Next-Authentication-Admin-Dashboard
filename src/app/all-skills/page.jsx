@@ -156,7 +156,9 @@ const CenterEngine3D = () => {
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
               className="w-full h-full"
             >
-              <img
+              <Image
+                width={29}
+                height={39}
                 src={skill.img}
                 alt="skill"
                 className="w-full h-full object-contain"
