@@ -1,1 +1,49 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.electric-circle-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-center: center;
+  width: fit-content;
+  height: fit-content;
+  border-radius: 50%; /* কন্টেইনারকে গোল করার জন্য */
+}
+
+.electric-canvas {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.circle-content {
+  position: relative;
+  z-index: 2;
+  border-radius: 50%;
+  overflow: hidden; /* ইমেজ যেন গোল থাকে */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* কাস্টম স্ক্রলবার হাইড Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,115 +1,169 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMenu, FiX } from 'react-icons/fi';
-import MyNavLinks from '../MyNavLinks';
+import {
+  FiHome,
+  FiUser,
+  FiCode,
+  FiBriefcase,
+  FiFileText,
+  FiMail,
+  FiLogOut,
+  FiLayout,
+  FiLogIn,
+} from 'react-icons/fi';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { authClient } from '@/lib/auth-client';
 
 const navItems = [
-  { id: '01', label: 'HOME', href: '/' },
-  { id: '02', label: 'ABOUT', href: '/about' },
-  { id: '03', label: 'SKILLS', href: '/all-skills' },
-  { id: '04', label: 'PROJECTS', href: '/all-projects' },
-  { id: '05', label: 'RESUME', href: '/resume' },
-  { id: '06', label: 'CONTACT', href: '/contact' },
+  { id: '01', label: 'HOME', href: '/', icon: <FiHome /> },
+  { id: '02', label: 'ABOUT', href: '/about', icon: <FiUser /> },
+  { id: '03', label: 'SKILLS', href: '/all-skills', icon: <FiCode /> },
+  { id: '04', label: 'PROJECTS', href: '/all-projects', icon: <FiBriefcase /> },
+  { id: '05', label: 'RESUME', href: '/resume', icon: <FiFileText /> },
+  { id: '06', label: 'CONTACT', href: '/contact', icon: <FiMail /> },
 ];
 
 const NavSideBar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
+  const pathname = usePathname();
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const getInitials = name => {
+    if (!name) return 'RH';
+    const parts = name.trim().split(' ');
+    return parts.length >= 2
+      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      : name.slice(0, 2).toUpperCase();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = e => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target))
+        setShowUserMenu(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const DropdownMenu = () => (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 10 }}
+      className="absolute top-14 left-0 md:top-0 md:left-20 w-52 bg-[#0a101f]/95 border border-white/10 rounded-2xl p-2 shadow-2xl backdrop-blur-xl z-[120]"
+    >
+      {user ? (
+        <div className="flex flex-col gap-1">
+          <div className="px-4 py-3 border-b border-white/5">
+            <p className="text-[10px] text-cyan-500 font-black uppercase mb-1">
+              User Profile
+            </p>
+            <p className="text-sm text-white font-bold truncate">{user.name}</p>
+          </div>
+          <Link
+            href="/profile"
+            className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 rounded-xl text-slate-300 text-[10px] font-black uppercase"
+          >
+            <FiUser /> My Profile
+          </Link>
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 rounded-xl text-slate-300 text-[10px] font-black uppercase"
+          >
+            <FiLayout /> Dashboard
+          </Link>
+          <button
+            onClick={() => authClient.signOut()}
+            className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-500/10 rounded-xl text-red-400 text-[10px] font-black uppercase w-full text-left"
+          >
+            <FiLogOut /> Logout
+          </button>
+        </div>
+      ) : (
+        <Link
+          href="/login"
+          className="flex items-center gap-3 px-4 py-3 bg-cyan-500/10 rounded-xl text-cyan-400 text-[10px] font-black uppercase justify-center transition-all"
+        >
+          <FiLogIn /> Sign In / Join
+        </Link>
+      )}
+    </motion.div>
+  );
 
   return (
     <>
-      {/* --- ডেক্সটপ সাইডবার (lg স্ক্রিনে আগের মতোই থাকবে) --- */}
-      <aside className="hidden lg:flex fixed left-0 top-0 z-50 h-screen w-24 lg:w-28 border-r border-white/5 bg-[#010714]/80 backdrop-blur-md flex flex-col items-center py-12">
-        <div className="mb-20">
-          <div className="w-14 h-14 rounded-full border border-cyan-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.15)] group cursor-pointer hover:border-cyan-400 transition-all">
-            <span className="text-cyan-400 font-serif text-xl tracking-tighter group-hover:scale-110 transition-transform">
-              RH
-            </span>
-          </div>
+      <header className="md:hidden fixed top-0 left-0 w-full h-16 bg-[#010714]/90 backdrop-blur-md border-b border-white/5 z-[100] flex items-center px-6 justify-between">
+        <div className="relative" ref={userMenuRef}>
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="w-10 h-10 rounded-full border-2 border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black italic text-sm"
+          >
+            {user ? getInitials(user.name) : 'RH'}
+          </button>
+          <AnimatePresence>{showUserMenu && <DropdownMenu />}</AnimatePresence>
         </div>
-
-        <nav className="flex flex-col items-center w-full">
-          {navItems.map((item, index) => (
-            <React.Fragment key={item.id}>
-              <MyNavLinks item={item} />
-              {index !== navItems.length - 1 && (
-                <div className="w-8 h-[1px] bg-white/5 my-2" />
-              )}
-            </React.Fragment>
+        <nav className="flex items-center gap-4 overflow-x-auto scrollbar-hide">
+          {navItems.map(item => (
+            <Link
+              key={item.id}
+              href={item.href}
+              className={`text-xl transition-all ${pathname === item.href ? 'text-cyan-400' : 'text-slate-500'}`}
+            >
+              {item.icon}
+            </Link>
           ))}
         </nav>
-        <div className="mt-auto text-[9px] text-slate-700 rotate-90 whitespace-nowrap tracking-[0.3em] font-bold uppercase">
-          V 1.0.4 - ACTIVE
-        </div>
-      </aside>
-
-      {/* --- মোবাইল টপ বার --- */}
-      <header className="lg:hidden fixed top-0 left-0 w-full h-20 z-[60] px-6 bg-[#010714]/90 backdrop-blur-lg border-b border-white/5 flex items-center justify-between">
-        <div className="text-cyan-400 font-serif text-xl font-bold tracking-tighter border border-cyan-500/30 w-10 h-10 rounded-full flex items-center justify-center">
-          RH
-        </div>
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="text-white p-2 focus:outline-none"
-        >
-          <FiMenu size={28} />
-        </button>
       </header>
 
-      {/* --- মোবাইল ড্রয়ার মেনু --- */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* ১. ব্যাকড্রপ/ওভারলে (মেনুর বাইরের অন্ধকার অংশ) */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)} // বাইরে ক্লিক করলে বন্ধ হবে
-              className="lg:hidden fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm"
-            />
-
-            {/* ২. ড্রয়ার কন্টেন্ট (ডান দিক থেকে স্লাইড করবে) */}
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed top-0 right-0 z-[80] h-screen w-[280px] bg-[#010714] border-l border-white/10 shadow-2xl flex flex-col"
-            >
-              {/* ড্রয়ার ক্লোজ বাটন */}
-              <div className="flex justify-end p-6">
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="text-cyan-400"
+      <aside className="hidden md:flex fixed left-0 top-0 h-screen w-20 lg:w-28 bg-[#010714] border-r border-white/5 z-[100] flex-col items-center py-10">
+        <div className="mb-14 relative" ref={userMenuRef}>
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="w-12 lg:w-14 h-12 lg:h-14 rounded-full border-2 border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black italic text-lg shadow-[0_0_15px_rgba(34,211,238,0.2)]"
+          >
+            {user ? getInitials(user.name) : 'RH'}
+          </button>
+          <AnimatePresence>{showUserMenu && <DropdownMenu />}</AnimatePresence>
+        </div>
+        <nav className="flex flex-col gap-8 w-full">
+          {navItems.map(item => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="group relative flex flex-col items-center"
+              >
+                <span
+                  className={`text-[10px] mb-1 font-mono transition-colors ${isActive ? 'text-cyan-400' : 'text-slate-600'}`}
                 >
-                  <FiX size={32} />
-                </button>
-              </div>
-
-              {/* ড্রয়ার লিঙ্কসমূহ */}
-              <nav className="flex flex-col space-y-2 mt-10">
-                {navItems.map((item, idx) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * idx }}
-                    onClick={() => setIsOpen(false)}
-                    className="w-full"
-                  >
-                    <MyNavLinks item={item} isMobile={true} />
-                  </motion.div>
-                ))}
-              </nav>
-
-              <div className="mt-auto p-10 text-center text-[10px] text-slate-700 tracking-[0.3em] font-bold uppercase">
-                V 1.0.4 - ACTIVE
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+                  {item.id}
+                </span>
+                <div
+                  className={`text-xl lg:text-2xl p-2.5 rounded-xl transition-all ${isActive ? 'text-cyan-400 bg-cyan-500/10' : 'text-slate-500 group-hover:text-cyan-400'}`}
+                >
+                  {item.icon}
+                </div>
+                <span
+                  className={`hidden lg:block text-[8px] font-black tracking-widest mt-1.5 uppercase transition-colors ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}
+                >
+                  {item.label}
+                </span>
+                <div className="absolute left-full ml-4 px-3 py-1 bg-cyan-500 text-black text-[10px] font-black rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none lg:hidden whitespace-nowrap">
+                  {item.label}
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="mt-auto rotate-180 text-[10px] text-slate-700 font-bold tracking-[0.3em] [writing-mode:vertical-lr] opacity-30">
+          V 3.0.2
+        </div>
+      </aside>
     </>
   );
 };
