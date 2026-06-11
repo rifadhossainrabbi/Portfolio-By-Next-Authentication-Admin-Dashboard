@@ -76,13 +76,13 @@ const NavSideBar = () => {
             <p className="px-4 py-1 text-[8px] text-slate-500 font-bold uppercase tracking-widest">
               Dashboard Nav
             </p>
-            <Link
+            {/* <Link
               href="/dashboard"
               onClick={() => setShowUserMenu(false)}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 rounded-xl text-slate-300 text-[10px] font-black uppercase"
             >
               <FiFolder className="text-cyan-400 text-lg" /> All Projects
-            </Link>
+            </Link> */}
             <Link
               href="/dashboard/add-projects"
               onClick={() => setShowUserMenu(false)}
@@ -98,7 +98,7 @@ const NavSideBar = () => {
             onClick={() => setShowUserMenu(false)}
             className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 rounded-xl text-slate-300 text-[10px] font-black uppercase"
           >
-            <FiLayout className="text-lg" /> Admin Panel
+            <FiLayout className="text-lg" /> All Projects
           </Link>
 
           <button
