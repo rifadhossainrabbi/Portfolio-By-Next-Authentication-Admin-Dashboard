@@ -34,6 +34,7 @@ const NavSideBar = () => {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
   const user = session?.user;
+  console.log("Current User data:", user);
 
   // নামের প্রথম অক্ষর বের করার লজিক
   const getInitials = name => {
@@ -76,13 +77,6 @@ const NavSideBar = () => {
             <p className="px-4 py-1 text-[8px] text-slate-500 font-bold uppercase tracking-widest">
               Dashboard Nav
             </p>
-            {/* <Link
-              href="/dashboard"
-              onClick={() => setShowUserMenu(false)}
-              className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 rounded-xl text-slate-300 text-[10px] font-black uppercase"
-            >
-              <FiFolder className="text-cyan-400 text-lg" /> All Projects
-            </Link> */}
             <Link
               href="/dashboard/add-projects"
               onClick={() => setShowUserMenu(false)}
