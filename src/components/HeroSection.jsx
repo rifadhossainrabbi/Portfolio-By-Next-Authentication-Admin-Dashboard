@@ -1,87 +1,32 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
 import { SiReact, SiNodedotjs, SiExpress, SiMongodb } from 'react-icons/si';
 import Image from 'next/image';
 import Link from 'next/link';
-
-// --- Particles Background (অপরিবর্তিত রাখা হয়েছে) ---
-const ParticlesBackground = () => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    let animationFrameId;
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = Math.random() * 0.4 - 0.2;
-        this.speedY = Math.random() * 0.4 - 0.2;
-        this.opacity = Math.random() * 0.5 + 0.2;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
-      draw() {
-        ctx.fillStyle = `rgba(34, 211, 238, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    const init = () => {
-      particles = [];
-      const count =
-        Math.floor((window.innerWidth * window.innerHeight) / 10000) + 100;
-      for (let i = 0; i < count; i++) particles.push(new Particle());
-    };
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      animationFrameId = requestAnimationFrame(animate);
-    };
-    window.addEventListener('resize', () => {
-      resize();
-      init();
-    });
-    resize();
-    init();
-    animate();
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
-      style={{ zIndex: 0 }}
-    />
-  );
-};
+import { Typewriter } from 'react-simple-typewriter';
+import Particles from './Particales';
+// Import the new particles
+// import Particles from './Particles';
 
 const HeroSection = () => {
   return (
     <section className="relative min-h-screen w-full flex flex-col bg-[#010714] text-white overflow-hidden font-sans selection:bg-cyan-500/30">
-      <ParticlesBackground />
+      {/* --- NEW HIGH-PERFORMANCE PARTICLES --- */}
+      <Particles
+        particleColors={['#0ea5e9', '#22d3ee', '#3b82f6', '#1d4ed8']}
+        particleCount={3500}
+        particleSpread={18}
+        speed={0.5}
+        particleBaseSize={200}
+        moveParticlesOnHover={true}
+        alphaParticles={false}
+        disableRotation={true}
+      />
 
       <div className="flex-1 flex flex-col lg:flex-row items-center px-6 md:px-12 lg:px-20 py-24 lg:py-0 z-10">
-        {/* --- টেক্সট সাইড (বাম পাশ) --- */}
+        {/* --- Text Side --- */}
         <div className="w-full lg:w-[55%] text-left z-20">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -99,10 +44,18 @@ const HeroSection = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-[100px] font-black leading-[0.9] tracking-tighter uppercase italic">
+            <h1 className="text-5xl md:text-7xl lg:text-[90px] font-black leading-[0.9] tracking-tighter uppercase italic">
               <span className="block text-white mb-2">HI I'M RIFAD</span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 drop-shadow-[0_0_30px_rgba(6,182,212,0.3)]">
-                HOSSAIN RABBI
+                <Typewriter
+                  words={['HOSSAIN RABBI', 'MERN DEVELOPER', 'PROBLEM SOLVER']}
+                  loop={0}
+                  cursor
+                  cursorStyle="_"
+                  typeSpeed={70}
+                  deleteSpeed={50}
+                  delaySpeed={2000}
+                />
               </span>
             </h1>
           </motion.div>
@@ -118,9 +71,11 @@ const HeroSection = () => {
           </motion.p>
 
           <div className="mt-10 flex flex-wrap gap-5">
-            <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.4)] text-white font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
-              EXPLORE MY WORK <FiArrowRight />
-            </button>
+            <Link href={'/all-projects'}>
+              <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.4)] text-white font-bold uppercase tracking-widest text-[10px] flex items-center gap-2">
+                EXPLORE MY WORK <FiArrowRight />
+              </button>
+            </Link>
             <Link href="/resume">
               <button className="px-8 py-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-[10px] font-bold uppercase tracking-widest text-slate-300">
                 VIEW RESUME
@@ -129,15 +84,12 @@ const HeroSection = () => {
           </div>
         </div>
 
-        {/* --- ইমেজ পার্ট (রেসপন্সিভ ডিজাইন) --- */}
+        {/* --- Image Part (Remains the same) --- */}
         <div className="relative w-full lg:w-[45%] h-[500px] lg:h-[650px] flex items-center justify-center group mt-12 lg:mt-0">
-          {/* ১. উজ্জ্বল ব্লু হ্যালো রিং (Responsive sizing) */}
           <div className="absolute w-[320px] md:w-[440px] h-[320px] md:h-[440px] rounded-full border-4 border-cyan-500/30 shadow-[0_0_80px_rgba(34,211,238,0.2)] flex items-center justify-center">
             <div className="w-[260px] md:w-[360px] h-[260px] md:h-[360px] rounded-full border border-cyan-400/10 animate-[pulse_4s_infinite]" />
           </div>
 
-          {/* ২. ফ্লোটিং স্কিল আইকন বক্সসমূহ (Responsive positions) */}
-          {/* React */}
           <motion.div
             animate={{ y: [0, -15, 0] }}
             transition={{ repeat: Infinity, duration: 4 }}
@@ -148,7 +100,6 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* Node */}
           <motion.div
             animate={{ y: [0, 15, 0] }}
             transition={{ repeat: Infinity, duration: 5 }}
@@ -162,7 +113,6 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* Express */}
           <motion.div
             animate={{ x: [0, 5, 0] }}
             transition={{ repeat: Infinity, duration: 6 }}
@@ -175,7 +125,6 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* MongoDB */}
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ repeat: Infinity, duration: 4.5 }}
@@ -186,7 +135,6 @@ const HeroSection = () => {
             </div>
           </motion.div>
 
-          {/* ৩. মেইন ইমেজ (Image Clipping fix) */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -199,11 +147,9 @@ const HeroSection = () => {
               fill
               priority
             />
-            {/* নিচের গ্রাডিয়েন্ট শ্যাডো (ইমেজ এবং ব্যাকগ্রাউন্ড ব্লেন্ড করার জন্য) */}
             <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#010714] to-transparent z-10" />
           </motion.div>
 
-          {/* ৪. ফুল স্ট্যাক ডেভেলপার গ্লাস কার্ড (Responsive) */}
           <div className="absolute bottom-10 left-0 md:left-10 z-40 bg-[#0a101f]/40 backdrop-blur-2xl border border-white/10 p-4 md:p-6 rounded-2xl max-w-[180px] md:max-w-[220px] shadow-2xl">
             <div className="flex items-center gap-2 mb-2">
               <p className="text-[10px] md:text-[11px] font-black uppercase text-slate-200 tracking-wider">
@@ -217,7 +163,6 @@ const HeroSection = () => {
             <div className="absolute bottom-2 right-2 w-0 h-0 border-l-[8px] border-l-transparent border-b-[8px] border-b-cyan-500/50" />
           </div>
 
-          {/* ৫. প্ল্যাটফর্ম গ্লো (Bottom glow) */}
           <div className="absolute bottom-4 z-10 w-[240px] md:w-[280px] h-1 bg-cyan-400/40 blur-md rounded-full shadow-[0_0_20px_#22d3ee]" />
         </div>
       </div>

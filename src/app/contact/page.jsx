@@ -1,70 +1,27 @@
 'use client';
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { FiMail, FiMapPin, FiArrowRight, FiTerminal } from 'react-icons/fi';
-
-// --- ১. Enhanced Particles Background ---
-const ParticlesBackground = () => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = Math.random() * 0.5 - 0.25;
-        this.speedY = Math.random() * 0.5 - 0.25;
-        this.opacity = Math.random() * 0.6;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y > canvas.height) this.y = 0;
-      }
-      draw() {
-        ctx.fillStyle = `rgba(34, 211, 238, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    const init = () => {
-      particles = [];
-      for (let i = 0; i < 100; i++) particles.push(new Particle());
-    };
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animate);
-    };
-    window.addEventListener('resize', resize);
-    resize();
-    init();
-    animate();
-    return () => window.removeEventListener('resize', resize);
-  }, []);
-  return (
-    <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
-  );
-};
+import { FiMail, FiMapPin, FiArrowRight } from 'react-icons/fi';
+import Particles from '@/components/Particales';
+// Import the high-performance particles
+// import Particles from './Particales';
 
 const ContactPage = () => {
   return (
     <div className="relative min-h-screen w-full bg-[#010714] text-white px-6 lg:px-20 py-20 overflow-hidden font-sans">
-      <ParticlesBackground />
+      {/* --- NEW HIGH-PERFORMANCE PARTICLES (Matches Hero) --- */}
+      <Particles
+        particleColors={['#0ea5e9', '#22d3ee', '#3b82f6', '#1d4ed8']}
+        particleCount={3500}
+        particleSpread={18}
+        speed={0.5}
+        particleBaseSize={200}
+        moveParticlesOnHover={true}
+        alphaParticles={false}
+        disableRotation={true}
+      />
 
-      <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-16">
+      <div className="relative z-10 max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-16 mt-10">
         {/* Left Side: Text & Info */}
         <div className="w-full lg:w-1/2">
           {/* Availability Badge */}
@@ -104,7 +61,7 @@ const ContactPage = () => {
           {/* Contact Details */}
           <div className="mt-12 space-y-6">
             <div className="flex items-center space-x-4 group">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
+              <div className="w-10 h-10 rounded-xl bg-[#0a101f]/60 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all backdrop-blur-xl">
                 <FiMail size={20} />
               </div>
               <div>
@@ -118,7 +75,7 @@ const ContactPage = () => {
             </div>
 
             <div className="flex items-center space-x-4 group">
-              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all">
+              <div className="w-10 h-10 rounded-xl bg-[#0a101f]/60 border border-white/10 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all backdrop-blur-xl">
                 <FiMapPin size={20} />
               </div>
               <div>
@@ -126,7 +83,7 @@ const ContactPage = () => {
                   NODE_LOCATION
                 </p>
                 <p className="text-sm font-bold text-slate-200">
-                  Natore, Bangladesh / Remote
+                  Dhaka, Bangladesh / Remote
                 </p>
               </div>
             </div>
@@ -176,11 +133,11 @@ const ContactPage = () => {
               <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest block mb-2">
                 PROTOCOL_SUBJECT
               </label>
-              <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all text-slate-400 appearance-none">
-                <option>Full Stack Development</option>
-                <option>System Architecture</option>
-                <option>UI/UX Engineering</option>
-                <option>Consultation</option>
+              <select className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-cyan-500/50 transition-all text-slate-400 appearance-none cursor-pointer">
+                <option className="bg-[#010714]">Full Stack Development</option>
+                <option className="bg-[#010714]">System Architecture</option>
+                <option className="bg-[#010714]">UI/UX Engineering</option>
+                <option className="bg-[#010714]">Consultation</option>
               </select>
             </div>
 

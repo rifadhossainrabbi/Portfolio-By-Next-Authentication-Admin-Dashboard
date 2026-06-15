@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import {
   FaEnvelope,
@@ -20,66 +20,9 @@ import {
   LuLayers,
 } from 'react-icons/lu';
 import Image from 'next/image';
-
-// --- ১. High-Visibility Particles Background ---
-const ParticlesBackground = () => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
-        this.speedX = Math.random() * 0.6 - 0.3;
-        this.speedY = Math.random() * 0.6 - 0.3;
-        this.opacity = Math.random() * 0.8 + 0.2;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.y > canvas.height) this.y = 0;
-        if (this.y < 0) this.y = canvas.height;
-      }
-      draw() {
-        ctx.fillStyle = `rgba(34, 211, 238, ${this.opacity})`;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#22d3ee';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    const init = () => {
-      particles = [];
-      for (let i = 0; i < 100; i++) particles.push(new Particle());
-    };
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animate);
-    };
-    window.addEventListener('resize', resize);
-    resize();
-    init();
-    animate();
-    return () => window.removeEventListener('resize', resize);
-  }, []);
-  return (
-    <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
-  );
-};
+import Particles from '@/components/Particales';
+// Import the high-performance particles
+// import Particles from './Particales';
 
 const ResumePage = () => {
   // Animation Variants
@@ -106,7 +49,17 @@ const ResumePage = () => {
 
   return (
     <div className="relative min-h-screen bg-[#010714] text-slate-300 p-6 lg:p-20 overflow-x-hidden font-sans selection:bg-cyan-500/30">
-      <ParticlesBackground />
+      {/* --- NEW HIGH-PERFORMANCE PARTICLES (Matching Hero) --- */}
+      <Particles
+        particleColors={['#0ea5e9', '#22d3ee', '#3b82f6', '#1d4ed8']}
+        particleCount={3500}
+        particleSpread={18}
+        speed={0.5}
+        particleBaseSize={200}
+        moveParticlesOnHover={true}
+        alphaParticles={false}
+        disableRotation={true}
+      />
 
       <motion.div
         variants={containerVariants}
@@ -155,15 +108,15 @@ const ResumePage = () => {
                 { icon: FaEnvelope, text: 'hossainmrifad@gmail.com' },
                 {
                   icon: FaGithub,
-                  text: 'https://github.com/rifadhossainrabbi',
+                  text: 'rifadhossainrabbi',
                 },
                 {
                   icon: FaFacebookF,
-                  text: 'https://www.facebook.com/rifad.hossain.7796',
+                  text: 'rifad.hossain.7796',
                 },
                 {
                   icon: FaLinkedinIn,
-                  text: 'https://www.linkedin.com/in/rifad-hossain-rabbi-6b51443b6',
+                  text: 'rifad-hossain-rabbi',
                 },
                 { icon: FaMapMarkerAlt, text: 'Dhaka, Bangladesh' },
               ].map((item, i) => (
@@ -172,7 +125,7 @@ const ResumePage = () => {
                   className="flex items-center gap-4 group/item cursor-pointer"
                 >
                   <item.icon className="text-cyan-500 group-hover/item:scale-125 transition-transform" />
-                  <span className="group-hover/item:text-cyan-400 transition-colors">
+                  <span className="group-hover/item:text-cyan-400 transition-colors break-all">
                     {item.text}
                   </span>
                 </li>

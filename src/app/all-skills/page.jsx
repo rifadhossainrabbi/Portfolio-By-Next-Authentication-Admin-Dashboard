@@ -1,92 +1,70 @@
 'use client';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiLayout, FiServer, FiCpu, FiTool, FiCloud } from 'react-icons/fi';
+import {
+  FiLayout,
+  FiServer,
+  FiTool,
+  FiCloud,
+  FiActivity,
+} from 'react-icons/fi';
 import Image from 'next/image';
+import Particles from '@/components/Particales';
+// Import the high-performance particles
+// import Particles from './Particales';
 
-// --- ১. Enhanced Particles Background ---
-const ParticlesBackground = () => {
-  const canvasRef = useRef(null);
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    class Particle {
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedX = Math.random() * 0.4 - 0.2;
-        this.speedY = Math.random() * 0.4 - 0.2;
-        this.opacity = Math.random() * 0.6 + 0.2;
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y > canvas.height) this.y = 0;
-      }
-      draw() {
-        ctx.fillStyle = `rgba(34, 211, 238, ${this.opacity})`;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = '#22d3ee';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-    const init = () => {
-      particles = [];
-      const count =
-        Math.floor((window.innerWidth * window.innerHeight) / 15000) + 80;
-      for (let i = 0; i < count; i++) particles.push(new Particle());
-    };
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      requestAnimationFrame(animate);
-    };
-    window.addEventListener('resize', () => {
-      resize();
-      init();
-    });
-    resize();
-    init();
-    animate();
-    return () => window.removeEventListener('resize', resize);
-  }, []);
-  return (
-    <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" />
-  );
-};
-
-// --- ২. Category Card (Responsive) ---
-const CategoryCard = ({ title, icon: Icon, tags, side = 'left' }) => (
+// --- Category Card ---
+const CategoryCard = ({
+  title,
+  icon: Icon,
+  tags,
+  side = 'left',
+  isLearning = false,
+}) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
-    className="relative p-5 lg:p-6 rounded-2xl bg-[#0a101f]/60 border border-white/10 backdrop-blur-xl group overflow-hidden w-full"
+    className={`relative p-5 lg:p-6 rounded-2xl bg-[#0a101f]/60 border backdrop-blur-xl group overflow-hidden w-full
+      ${isLearning ? 'border-cyan-500/20 shadow-[0_0_15px_rgba(34,211,238,0.05)]' : 'border-white/10 hover:border-cyan-500/40'}`}
   >
+    {isLearning && (
+      <motion.div
+        animate={{ left: ['-100%', '100%'] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+        className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-400 to-transparent z-20"
+      />
+    )}
     <div className="relative z-10">
-      <div className="flex items-center space-x-3 mb-4">
-        <Icon className="text-cyan-400" size={20} />
-        <h3 className="text-xs lg:text-sm font-black tracking-[0.2em] uppercase text-white">
-          {title}
-        </h3>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <Icon
+            className={isLearning ? 'text-amber-400' : 'text-cyan-400'}
+            size={20}
+          />
+          <motion.h3
+            animate={
+              isLearning
+                ? { backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }
+                : {}
+            }
+            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+            className={`text-xs lg:text-sm font-black tracking-[0.2em] uppercase 
+              ${isLearning ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-amber-400 to-blue-500 bg-[length:200%_auto]' : 'text-white'}`}
+          >
+            {title}
+          </motion.h3>
+        </div>
+        {isLearning && (
+          <FiActivity className="text-amber-500/60 animate-pulse" size={14} />
+        )}
       </div>
       <div className="flex flex-wrap gap-2">
         {tags.map((tag, idx) => (
           <span
             key={idx}
-            className="px-2.5 py-1 text-[9px] lg:text-[10px] font-bold tracking-widest uppercase rounded-lg bg-white/5 border border-white/10 text-slate-300 group-hover:text-cyan-400 group-hover:border-cyan-500/30 transition-all"
+            className={`px-2.5 py-1 text-[9px] lg:text-[10px] font-bold tracking-widest uppercase rounded-lg border transition-all 
+            ${isLearning ? 'bg-amber-500/5 border-amber-500/20 text-amber-200/80' : 'bg-white/5 border-white/10 text-slate-300 group-hover:text-cyan-400 group-hover:border-cyan-500/30'}`}
           >
             {tag}
           </span>
@@ -94,19 +72,16 @@ const CategoryCard = ({ title, icon: Icon, tags, side = 'left' }) => (
       </div>
     </div>
     <div
-      className={`absolute top-0 ${side === 'left' ? 'right-0' : 'left-0'} w-10 h-10 border-t border-cyan-500/20 rounded-tr-2xl`}
+      className={`absolute top-0 ${side === 'left' ? 'right-0' : 'left-0'} w-8 h-8 border-t-2 ${isLearning ? 'border-amber-400/30' : 'border-cyan-500/20'} rounded-tr-xl`}
     />
   </motion.div>
 );
 
-// --- ৩. Angled 3D Rotating Skill Engine (Responsive Radius) ---
+// --- Realistic Blue & Amber 3D Engine ---
 const CenterEngine3D = () => {
   const [radius, setRadius] = useState(250);
-
   useEffect(() => {
-    const handleResize = () => {
-      setRadius(window.innerWidth < 768 ? 140 : 250); // মোবাইলে রেডিয়াস কমানো হয়েছে
-    };
+    const handleResize = () => setRadius(window.innerWidth < 768 ? 140 : 250);
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -116,65 +91,94 @@ const CenterEngine3D = () => {
     {
       img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg',
       angle: 0,
+      color: 'blue',
     },
     {
       img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ7S33Oq2FeRbyBBA6l1q8PwLVa3SzaONO-9Q&s',
       angle: 72,
+      color: 'amber',
     },
     {
       img: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
       angle: 144,
+      color: 'blue',
     },
     {
       img: 'https://www.clipartmax.com/png/middle/70-701332_hire-node-js-developer-node-logo.png',
       angle: 216,
+      color: 'amber',
     },
     {
       img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSV9uzErWz9EXqZDxZ5lP9aYpMz8eK6rr5X3w&s',
       angle: 288,
+      color: 'blue',
     },
   ];
 
   return (
-    <div className="relative h-[400px] md:h-[550px] flex items-center justify-center [perspective:1000px] overflow-visible">
+    <div className="relative h-[450px] md:h-[600px] flex items-center justify-center [perspective:1200px]">
+      <div className="absolute w-[400px] h-[400px] md:w-[600px] md:h-[600px] rounded-full border border-blue-500/5 rotate-X-75" />
+      <div className="absolute w-[300px] h-[300px] md:w-[450px] md:h-[450px] rounded-full border border-amber-500/5 rotate-X-75 animate-reverse-spin" />
+
       <motion.div
         animate={{ rotateY: -360 }}
-        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-        style={{ transformStyle: 'preserve-3d', rotateX: -15 }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+        style={{ transformStyle: 'preserve-3d', rotateX: -10 }}
         className="relative w-32 h-32 md:w-64 md:h-64 flex items-center justify-center"
       >
         {skills.map((skill, i) => (
-          <motion.div
+          <div
             key={i}
-            className="absolute w-16 h-16 md:w-24 md:h-24 bg-[#0a101f]/90 border border-white/10 rounded-2xl flex items-center justify-center p-3 md:p-4 backdrop-blur-md shadow-2xl"
+            className="absolute"
             style={{
               transform: `rotateY(${skill.angle}deg) translateZ(${radius}px)`,
             }}
           >
             <motion.div
-              animate={{ rotateY: 360, rotateX: 15 }}
-              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-              className="w-full h-full"
+              animate={{
+                rotateY: 360,
+                y: [0, -20, 0],
+              }}
+              transition={{
+                rotateY: { duration: 30, repeat: Infinity, ease: 'linear' },
+                y: {
+                  duration: 4,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                  delay: i * 0.5,
+                },
+              }}
+              className={`relative w-16 h-16 md:w-28 md:h-28 rounded-2xl p-4 backdrop-blur-xl border-2 flex items-center justify-center transition-all duration-500
+                ${
+                  skill.color === 'blue'
+                    ? 'bg-blue-500/10 border-blue-400/30 shadow-[0_0_30px_rgba(59,130,246,0.2)]'
+                    : 'bg-amber-500/10 border-amber-400/30 shadow-[0_0_30px_rgba(245,158,11,0.2)]'
+                }`}
             >
+              <div
+                className={`absolute inset-0 rounded-2xl opacity-20 ${skill.color === 'blue' ? 'bg-blue-400' : 'bg-amber-400'} blur-md`}
+              />
               <Image
-                width={29}
-                height={39}
+                width={80}
+                height={80}
                 src={skill.img}
                 alt="skill"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain relative z-10"
               />
             </motion.div>
-          </motion.div>
+          </div>
         ))}
-        <div className="absolute w-32 h-32 md:w-40 md:h-40 bg-cyan-500/10 blur-[80px] md:blur-[100px] rounded-full animate-pulse" />
+
+        <div className="absolute w-32 h-32 bg-blue-500/10 blur-[80px] rounded-full" />
+        <div className="absolute w-24 h-24 bg-amber-500/5 blur-[60px] rounded-full" />
       </motion.div>
 
-      <div className="absolute bottom-0 md:bottom-10 text-center z-10">
-        <p className="text-[8px] md:text-[10px] font-black tracking-[0.5em] text-cyan-400 uppercase mb-1">
-          Core_Infrastructure
+      <div className="absolute bottom-5 text-center">
+        <p className="text-[10px] font-black tracking-[0.5em] text-blue-400 uppercase opacity-60">
+          Active_Infrastructure
         </p>
-        <h2 className="text-2xl md:text-6xl font-black italic tracking-tighter uppercase text-white">
-          TECH STACK
+        <h2 className="text-3xl md:text-6xl font-black italic text-white uppercase tracking-tighter">
+          MERN <span className="text-amber-500">STACK</span>
         </h2>
       </div>
     </div>
@@ -183,75 +187,76 @@ const CenterEngine3D = () => {
 
 const SkillsPage = () => {
   return (
-    <div className="relative min-h-screen w-full bg-[#010714] text-white px-4 md:px-10 lg:px-20 py-10 md:py-20 overflow-x-hidden font-sans">
-      <ParticlesBackground />
+    <div className="relative min-h-screen w-full bg-[#010714] text-white px-6 lg:px-20 py-20 overflow-x-hidden font-sans">
+      {/* --- NEW HIGH-PERFORMANCE PARTICLES (Matches Hero) --- */}
+      <Particles
+        particleColors={['#0ea5e9', '#22d3ee', '#3b82f6', '#1d4ed8']}
+        particleCount={3500}
+        particleSpread={18}
+        speed={0.5}
+        particleBaseSize={200}
+        moveParticlesOnHover={true}
+        alphaParticles={false}
+        disableRotation={true}
+      />
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Header */}
-        <header className="mb-12 md:mb-24 text-center lg:text-left">
+        <header className="mb-12">
           <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-7xl lg:text-9xl font-black italic tracking-tighter uppercase leading-[1.1] lg:leading-[0.8]"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-5xl md:text-8xl font-black italic tracking-tighter uppercase"
           >
             TECH_
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-600 drop-shadow-[0_0_30px_rgba(6,182,212,0.4)]">
-              ARSENAL
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-amber-600">
+              SYSTEMS
             </span>
           </motion.h1>
-          <p className="mt-4 md:mt-8 max-w-2xl mx-auto lg:mx-0 text-slate-400 text-xs md:text-lg font-medium border-l-0 lg:border-l-4 border-cyan-500/50 lg:pl-6 leading-relaxed">
-            Scalable architectures and high-performance technologies for the
-            modern web ecosystem.
-          </p>
         </header>
 
-        {/* Main Grid */}
-        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-          {/* Engine - মোবাইলে এটি আগে দেখাবে */}
-          <div className="w-full lg:col-span-6 lg:order-2 order-1">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-10 items-center">
+          <div className="w-full lg:col-span-6 lg:order-2">
             <CenterEngine3D />
           </div>
 
-          {/* Left Categories */}
-          <div className="w-full lg:col-span-3 lg:order-1 order-2 space-y-6 md:space-y-8">
+          <div className="w-full lg:col-span-3 lg:order-1 space-y-8">
             <CategoryCard
               title="Frontend"
               icon={FiLayout}
-              tags={['React', 'Next.js', 'Tailwind', 'Framer Motion']}
+              tags={['React', 'Next.js', 'Tailwind', 'Framer']}
               side="left"
             />
             <CategoryCard
-              title="DevOps"
+              title="LEARNING"
               icon={FiCloud}
-              tags={['AWS', 'Docker', 'Vercel']}
+              isLearning={true}
+              tags={['TypeScript', 'Redis', 'Docker', 'Testing', 'PostgreSQL']}
               side="left"
             />
           </div>
 
-          {/* Right Categories */}
-          <div className="w-full lg:col-span-3 lg:order-3 order-3 space-y-6 md:space-y-8">
+          <div className="w-full lg:col-span-3 lg:order-3 space-y-8">
             <CategoryCard
               title="Backend"
               icon={FiServer}
-              tags={['Node.js', 'Express', 'MongoDB', 'Mongoose']}
+              tags={['Node.js', 'Express', 'MongoDB', 'SQL']}
               side="right"
             />
             <CategoryCard
               title="Tools"
               icon={FiTool}
-              tags={['Git', 'Figma', 'Postman']}
+              tags={['Git', 'Figma', 'Postman', 'Vercel']}
               side="right"
             />
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="flex flex-col md:flex-row justify-between items-center text-[8px] md:text-[10px] text-slate-700 font-bold uppercase tracking-[0.4em] mt-16 md:mt-24 pt-10 border-t border-white/5 gap-4">
-          <span>© 2024 ARCH_SYSTEMS_V3</span>
-          <div className="flex items-center space-x-4">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
-            <span>Environment: Active</span>
-          </div>
+        <footer className="mt-20 pt-10 border-t border-white/5 flex justify-between text-[10px] font-bold text-slate-600 tracking-[0.3em] uppercase relative z-10">
+          <span>Systems v3.0 // 2024</span>
+          <span className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]" />{' '}
+            Status: Online
+          </span>
         </footer>
       </div>
     </div>

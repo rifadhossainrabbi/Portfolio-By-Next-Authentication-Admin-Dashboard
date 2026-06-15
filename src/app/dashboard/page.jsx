@@ -9,20 +9,17 @@ import {
   FiLoader,
 } from 'react-icons/fi';
 import toast from 'react-hot-toast';
-import DeleteModal from './DeleteModal'; // Make sure the path is correct
+import DeleteModal from './DeleteModal';
 import Link from 'next/link';
 
 const DashboardPage = () => {
   const [projects, setProjects] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
   const baseUrl = process.env.NEXT_PUBLIC_SERVER;
 
-  // 1. Fetch Data from MongoDB
   const fetchProjects = async () => {
     try {
       setIsLoading(true);
@@ -30,7 +27,6 @@ const DashboardPage = () => {
       const data = await res.json();
       setProjects(data);
     } catch (error) {
-      console.error('Error fetching projects:', error);
       toast.error('Failed to load system nodes.');
     } finally {
       setIsLoading(false);
@@ -41,7 +37,6 @@ const DashboardPage = () => {
     fetchProjects();
   }, [baseUrl]);
 
-  // 2. Delete Handler Logic
   const openDeleteModal = project => {
     setSelectedProject(project);
     setIsModalOpen(true);
@@ -49,28 +44,16 @@ const DashboardPage = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedProject) return;
-
     try {
       const res = await fetch(`${baseUrl}/projects/${selectedProject._id}`, {
         method: 'DELETE',
       });
       const data = await res.json();
-
       if (data.deletedCount > 0) {
-        toast.success('Node successfully purged from database', {
-          style: {
-            background: '#0a101f',
-            color: '#ef4444',
-            border: '1px solid rgba(239,68,68,0.2)',
-          },
-        });
-        // Remove from local state
+        toast.success('Node successfully purged');
         setProjects(projects.filter(p => p._id !== selectedProject._id));
-      } else {
-        toast.error('Failed to delete node.');
       }
     } catch (error) {
-      console.error('Delete error:', error);
       toast.error('System error during deletion.');
     } finally {
       setIsModalOpen(false);
@@ -80,22 +63,27 @@ const DashboardPage = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="p-6 lg:p-10 space-y-10 min-h-screen bg-[#050811]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      /* এখানে bg-[#050811] সরিয়ে bg-transparent করা হয়েছে যাতে লেআউটের পার্টিকেল দেখা যায় */
+      className="p-6 lg:p-10 space-y-10 min-h-screen bg-transparent relative z-10"
     >
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
         <div>
           <h1 className="text-5xl font-black text-white tracking-tighter italic uppercase leading-none">
-            Active <span className="text-cyan-400 text-glow">Nodes</span>
+            Active{' '}
+            <span className="text-cyan-400 drop-shadow-[0_0_15px_rgba(34,211,238,0.4)]">
+              Nodes
+            </span>
           </h1>
           <p className="text-[10px] text-slate-500 mt-3 uppercase tracking-[0.3em] font-bold border-l-2 border-cyan-500 pl-4">
             System Kernel Repository
           </p>
         </div>
 
-        <div className="bg-[#0a101f] border border-white/5 p-6 rounded-3xl min-w-[180px] shadow-2xl">
+        {/* গ্লাস ইফেক্ট কার্ড */}
+        <div className="bg-[#0a101f]/60 backdrop-blur-xl border border-white/10 p-6 rounded-3xl min-w-[180px] shadow-2xl">
           <p className="text-[9px] text-slate-600 font-black uppercase tracking-widest mb-2">
             Total Projects
           </p>
@@ -119,20 +107,16 @@ const DashboardPage = () => {
             <motion.div
               key={proj._id}
               whileHover={{ y: -5 }}
-              className="bg-[#0a101f] border border-white/5 rounded-[2rem] overflow-hidden group hover:border-cyan-500/30 transition-all shadow-2xl"
+              /* কার্ডগুলোতে গ্লাস-মর্ফিজম (backdrop-blur) যোগ করা হয়েছে */
+              className="bg-[#0a101f]/60 backdrop-blur-md border border-white/10 rounded-[2rem] overflow-hidden group hover:border-cyan-500/30 transition-all shadow-2xl"
             >
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={proj.imageUrl || 'https://via.placeholder.com/400x200'}
                   alt={proj.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a101f] via-transparent to-transparent" />
-                <div className="absolute top-4 right-4">
-                  <span className="bg-black/60 backdrop-blur-md text-cyan-400 text-[8px] font-black px-3 py-1 rounded-full border border-cyan-500/20 uppercase tracking-widest">
-                    {proj.isPublic ? 'Public Access' : 'Internal Only'}
-                  </span>
-                </div>
               </div>
 
               <div className="p-8 space-y-4">
@@ -144,7 +128,7 @@ const DashboardPage = () => {
                   {proj.techStack?.map((tech, idx) => (
                     <span
                       key={idx}
-                      className="text-[8px] font-bold text-slate-500 border border-white/5 px-2 py-1 rounded uppercase bg-white/5"
+                      className="text-[8px] font-bold text-slate-400 border border-white/5 px-2 py-1 rounded uppercase bg-white/5"
                     >
                       {tech}
                     </span>
@@ -160,7 +144,6 @@ const DashboardPage = () => {
                     <a
                       href={proj.githubUrl}
                       target="_blank"
-                      rel="noreferrer"
                       className="text-slate-500 hover:text-cyan-400 transition-colors"
                     >
                       <FiGithub size={18} />
@@ -168,7 +151,6 @@ const DashboardPage = () => {
                     <a
                       href={proj.liveLink}
                       target="_blank"
-                      rel="noreferrer"
                       className="text-slate-500 hover:text-cyan-400 transition-colors"
                     >
                       <FiExternalLink size={18} />
@@ -181,7 +163,6 @@ const DashboardPage = () => {
                         <FiEdit3 size={16} />
                       </button>
                     </Link>
-                    {/* Delete Trigger Button */}
                     <button
                       onClick={() => openDeleteModal(proj)}
                       className="p-2.5 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-500 border border-red-500/10 transition-all"
@@ -196,16 +177,7 @@ const DashboardPage = () => {
         </div>
       )}
 
-      {/* Empty State */}
-      {!isLoading && projects.length === 0 && (
-        <div className="text-center py-32 border border-dashed border-white/5 rounded-[3rem]">
-          <p className="text-slate-600 font-black uppercase tracking-[0.3em] text-xs">
-            No active nodes detected in the local kernel
-          </p>
-        </div>
-      )}
-
-      {/* DELETE MODAL COMPONENT */}
+      {/* DELETE MODAL */}
       <DeleteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
