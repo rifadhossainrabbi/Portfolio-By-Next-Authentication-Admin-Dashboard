@@ -295,7 +295,7 @@ const EditProjectPage = () => {
             className="px-12 py-4 bg-cyan-500 text-black rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-cyan-400 active:scale-95 transition-all disabled:opacity-50"
           >
             {isUpdating ? <FiLoader className="animate-spin" /> : <FiSend />}
-            Commit Updates
+            Commit Update
           </button>
         </div>
       </form>
